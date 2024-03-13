@@ -2,7 +2,7 @@
 
 use image::{ImageBuffer, Rgba};
 
-
+use rand::prelude::*;
 use std::env;
 
 mod stuff;
@@ -20,12 +20,23 @@ use stuff::*;
 
 //add background color input
 fn draw(img: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, shape:&mut Shape){
-    let fg = shape.foreground_color;
     let bg= shape.background_color;
+    let fg;
+    if shape.random_color{
+        let mut rng =rand::thread_rng();
+        let r: u8 = rng.gen(); 
+        let g: u8 = rng.gen(); 
+        let b: u8 = rng.gen(); 
+        fg=Rgba([r,g,b,255]);
+    }
+    else{
+        fg = shape.foreground_color;
+    }
     
     let base_size = get_area(&shape.vertices, &shape.origin);
     //let range = &shape.radius;
     for (x, y, pixel) in img.enumerate_pixels_mut() {
+
         let normalized_position = normalize(&x, &y);
         if get_distance(&normalized_position, &shape.origin) < shape.radius{
             if get_area(&shape.vertices, &normalized_position) <= base_size+0.000001{
@@ -48,10 +59,12 @@ fn save_image(img: &ImageBuffer<Rgba<u8>, Vec<u8>>, filename: &str) {
 
 pub fn main() {
     let help_text:&str=("usage: shapefactory.exe [-h] [-c <corner count>] [-W <canvas-width>] [-H <canvas-height>] [-scale <value>] 
-                        a[-random-scale] [-random-rotation] [-fg <hex-32bit>] [-bg <hex-32bit>] [-n <filename>]");
+                        [-random-scale] [-random-rotation] [-fg <hex-32bit>] [-bg <hex-32bit>] [-n <filename>] 
+                        [-count <number of images>] [-random-color]");
     let args: Vec<String> = env::args().collect();
     if args.len()<=1{
         println!("{}",help_text);
+
         std::process::exit(0);
     }
 
@@ -63,15 +76,16 @@ pub fn main() {
             println!("a possible flag has been entered but no value has been given");
             std::process::exit(0);
         }
-        else{}
+        
         match args[i].as_str(){
-            "-h" => {println!("{}",help_text);std::process::exit(0);}
+            //"-h" => {println!("{}",help_text);std::process::exit(0);}
             "-c"=> {shape.corner_count=args[i+1].parse::<u32>().unwrap();}
             "-W" =>{shape.width=args[i+1].parse::<u32>().unwrap();}
             "-H"=>{shape.height=args[i+1].parse::<u32>().unwrap();}
             "-scale" => {shape.random_scale=false;  shape.radius=args[i+1].parse::<f32>().unwrap();}
             "-random-scale" => {shape.random_scale=true;}
             "-random-rotation" => {shape.random_rotation=true;}
+            "-random-color" => {shape.random_color=true}
             "-count"=>{img_count=args[i+1].parse::<u32>().unwrap();}
             "-fg"=>{
                 let val =&args[i+1];
@@ -98,7 +112,7 @@ pub fn main() {
             "-n" => {base_filename=String::from(&args[i+1])}
             
 
-            _ => {println!("{}",help_text);std::process::exit(0);}
+            _ => {}
         }
     }
     if shape.corner_count <=2{
