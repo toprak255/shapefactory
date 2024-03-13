@@ -1,1 +1,1 @@
-# shape-factory
+# shapefactory
