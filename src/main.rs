@@ -37,7 +37,7 @@ fn draw(img: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, shape:&mut Shape){
     //let range = &shape.radius;
     for (x, y, pixel) in img.enumerate_pixels_mut() {
 
-        let normalized_position = normalize(&x, &y);
+        let normalized_position = normalize(&x, &y,&shape);
         if get_distance(&normalized_position, &shape.origin) < shape.radius{
             if get_area(&shape.vertices, &normalized_position) <= base_size+0.000001{
                 *pixel = fg;
@@ -58,7 +58,7 @@ fn save_image(img: &ImageBuffer<Rgba<u8>, Vec<u8>>, folder_path: Option<&String>
 }
 
 pub fn main() {
-    let help_text:&str=("usage: shapefactory.exe [-h] [-corner <corner count>] [-Width <canvas-width>] [-Height <canvas-height>] [-scale <value>] 
+    let help_text:&str=("usage: shapefactory.exe [-corner <corner count>] [-Width <canvas-width>] [-Height <canvas-height>] [-scale <value>] 
                         [-random-scale] [-random-rotation] [-fg <hex-32bit>] [-bg <hex-32bit>] [-f <folderPath>] [-n <filename>] 
                         [-count <number of images>] [-random-color]
                         
