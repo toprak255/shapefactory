@@ -52,15 +52,18 @@ fn draw(img: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, shape:&mut Shape){
     }
 
 }
-fn save_image(img: &ImageBuffer<Rgba<u8>, Vec<u8>>, filename: &str) {
-    let _ = img.save(&filename).expect("Failed to save image");
+fn save_image(img: &ImageBuffer<Rgba<u8>, Vec<u8>>, folder_path: Option<&String>, filename: &str) {
+    let path=format!("{}/{}", folder_path.unwrap(), filename);
+    let _ = img.save(&path).expect("Failed to save image");
 }
 
-
 pub fn main() {
-    let help_text:&str=("usage: shapefactory.exe [-h] [-c <corner count>] [-W <canvas-width>] [-H <canvas-height>] [-scale <value>] 
-                        [-random-scale] [-random-rotation] [-fg <hex-32bit>] [-bg <hex-32bit>] [-n <filename>] 
-                        [-count <number of images>] [-random-color]");
+    let help_text:&str=("usage: shapefactory.exe [-h] [-corner <corner count>] [-Width <canvas-width>] [-Height <canvas-height>] [-scale <value>] 
+                        [-random-scale] [-random-rotation] [-fg <hex-32bit>] [-bg <hex-32bit>] [-f <folderPath>] [-n <filename>] 
+                        [-count <number of images>] [-random-color]
+                        
+                        providing filename and corner count is necassary, other values have defaults that can optionally be changed
+                        ");
     let args: Vec<String> = env::args().collect();
     if args.len()<=1{
         println!("{}",help_text);
@@ -71,6 +74,7 @@ pub fn main() {
     let mut shape =Shape::new();
     let mut img_count:u32 = 0;
     let mut base_filename =String::new();
+    let mut folder_path =String::from(".");
     for i in 1..args.len(){
         if args.len()<i+1{
             println!("a possible flag has been entered but no value has been given");
@@ -79,9 +83,9 @@ pub fn main() {
         
         match args[i].as_str(){
             //"-h" => {println!("{}",help_text);std::process::exit(0);}
-            "-c"=> {shape.corner_count=args[i+1].parse::<u32>().unwrap();}
-            "-W" =>{shape.width=args[i+1].parse::<u32>().unwrap();}
-            "-H"=>{shape.height=args[i+1].parse::<u32>().unwrap();}
+            "-corner"=> {shape.corner_count=args[i+1].parse::<u32>().unwrap();}
+            "-Width" =>{shape.width=args[i+1].parse::<u32>().unwrap();}
+            "-Height"=>{shape.height=args[i+1].parse::<u32>().unwrap();}
             "-scale" => {shape.random_scale=false;  shape.radius=args[i+1].parse::<f32>().unwrap();}
             "-random-scale" => {shape.random_scale=true;}
             "-random-rotation" => {shape.random_rotation=true;}
@@ -109,6 +113,7 @@ pub fn main() {
                 if let Some(rgba_color) = to_rgb(color.as_str()){
                 shape.background_color=rgba_color;}
                 }}
+            "-f" => {folder_path=String::from(&args[i+1])}
             "-n" => {base_filename=String::from(&args[i+1])}
             
 
@@ -128,7 +133,7 @@ pub fn main() {
         shape.set_shape();
         draw(&mut img,&mut shape);
         let filename = format!("{}{}.png", base_filename, i);
-        save_image(&img, &filename);
+        save_image(&img,Some(&folder_path), &filename);
     }
 
 }
