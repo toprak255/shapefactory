@@ -82,7 +82,7 @@ impl Shape {
             self.radius= (y+1.) /2.;
         }
 
-        if self.corner_count>20{
+        if self.corner_count>15{
             self.vertices=Vec::new();
         }
         for i in 1..self.corner_count+1{
