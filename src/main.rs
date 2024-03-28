@@ -20,14 +20,23 @@ fn draw(img: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, shape:&mut Shape){
     else{
         fg = shape.foreground_color;
     }
-    
+    if shape.vertices.is_empty(){
+        for (x, y, pixel) in img.enumerate_pixels_mut() {
+            let normalized_position = normalize(&x, &y,&shape);
+        if get_distance(&normalized_position, &shape.origin) < shape.radius{
+            *pixel = fg;
+        }
+        else{
+            *pixel=bg;
+        }
+    }}
     let base_size = get_area(&shape.vertices, &shape.origin);
     //let range = &shape.radius;
     for (x, y, pixel) in img.enumerate_pixels_mut() {
 
         let normalized_position = normalize(&x, &y,&shape);
         if get_distance(&normalized_position, &shape.origin) < shape.radius{
-            if get_area(&shape.vertices, &normalized_position) <= base_size+0.000001{
+            if get_area(&shape.vertices, &normalized_position) <= base_size+0.00003{
                 *pixel = fg;
             }
             else {

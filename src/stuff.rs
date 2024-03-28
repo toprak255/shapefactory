@@ -1,7 +1,7 @@
 
 use rand::prelude::*;
 
-//use image::{ImageBuffer, Rgba};
+
 use image::Rgba;
 
 pub const PI: f32 = 3.14159265358979323846264338327950288_f32;
@@ -71,7 +71,7 @@ impl Shape {
     pub fn set_shape(&mut self){
         self.vertices.clear();
         //if (random_scale.is_some() || radius.is_some()) && (random_rotation.is_some() || rotation.is_some()){
-        
+
         //let mut vertices:Vec<Vec2>=Vec::new();
         let angle_offset = 2.*PI/self.corner_count as f32;
         
@@ -80,6 +80,10 @@ impl Shape {
             let mut rng =rand::thread_rng();
             let y: f32 = rng.gen(); 
             self.radius= (y+1.) /2.;
+        }
+
+        if self.corner_count>20{
+            self.vertices=Vec::new();
         }
         for i in 1..self.corner_count+1{
            self.vertices.push(Vec2::new(f32::cos(i as f32 *angle_offset)*self.radius ,f32::sin(i as f32 *angle_offset)*self.radius));
